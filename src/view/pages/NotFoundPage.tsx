@@ -1,4 +1,4 @@
-import React from "react";
+import { startTransition } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
@@ -13,7 +13,7 @@ function NotFoundPage() {
   const navigate = useNavigate();
 
   const handleBackToMail = () => {
-    navigate("/");
+    startTransition(() => navigate("/"));
   };
 
   return (

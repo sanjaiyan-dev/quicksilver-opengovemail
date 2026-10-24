@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useDeferredValue } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import { Fab, Box, useMediaQuery, useTheme } from "@mui/material";
@@ -25,26 +25,27 @@ function MailPage() {
   } = useData();
   const { openCompose } = useCompose();
   const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearchQuery = useDeferredValue(searchQuery, "")
 
   const thread = threadId ? getThread(threadId) : undefined;
 
   const filteredThreads = useMemo(() => {
-    if (!searchQuery) return emailThreads;
-    const query = searchQuery.toLowerCase();
+    if (!deferredSearchQuery) return emailThreads;
+    const query = deferredSearchQuery.toLowerCase();
     return emailThreads.filter(
       (thread) =>
         thread.subject.toLowerCase().includes(query) ||
         thread.lastMessage.toLowerCase().includes(query) ||
         thread.participants.some((p) => p.name.toLowerCase().includes(query)),
     );
-  }, [emailThreads, searchQuery]);
+  }, [emailThreads, deferredSearchQuery]);
 
   const list = (
     <ThreadList
       threads={filteredThreads}
       loading={loading}
-      emptyMessage={searchQuery ? "No emails match your search" : "No emails yet"}
-      onRefresh={searchQuery ? undefined : refreshActive}
+      emptyMessage={deferredSearchQuery ? "No emails match your search" : "No emails yet"}
+      onRefresh={deferredSearchQuery ? undefined : refreshActive}
       live={realtimeConnected}
       onPrefetch={prefetchMessages}
       selectedThreadId={threadId}
